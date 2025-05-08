@@ -57,6 +57,8 @@ const promptFeatures = async () => {
 	const features = [
 		{ title: "Commands", value: "commands", dependencies: ["events"] },
 		{ title: "Events", value: "events", dependencies: [] },
+		{ title: "MongoDB", value: "mongoDB", dependencies: [] },
+		{ title: "JSON Database", value: "jsonDB", dependencies: [] },
 	];
 
 	const { selectedFeatures } = await prompts({
@@ -101,7 +103,11 @@ const promptFeatures = async () => {
 	// Creates a djss.config.js file in the root directory of the project
 	const configContent = `module.exports = {\n\tuseEvents: ${selectedFeaturesSet.has(
 		"events"
-	)},\n\tuseCommands: ${selectedFeaturesSet.has("commands")},\n};`;
+	)},\n\tuseCommands: ${selectedFeaturesSet.has(
+		"commands"
+	)},\n\tuseMongoDB: ${selectedFeaturesSet.has(
+		"mongoDB"
+	)},\n\tuseJSONDB: ${selectedFeaturesSet.has("jsonDB")},\n};`;
 	fs.writeFileSync(path.join(projectPath, "djss.config.js"), configContent);
 
 	console.log("Project setup complete.");
