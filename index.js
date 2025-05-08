@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const prompts = require("prompts");
 const fs = require("fs");
 const path = require("path");
@@ -9,6 +11,11 @@ const main = async () => {
 	await initDirectory();
 	await promptFeatures();
 	await promptConfig();
+	await editPackageJson();
+
+	console.log(
+		"Project setup complete! You can now start your bot by running 'npm run dev'."
+	);
 };
 
 const initDirectory = async () => {
@@ -125,6 +132,19 @@ const promptConfig = async () => {
 	const envContent = `TOKEN=${token}\nCLIENT_ID=${clientId}\nGUILD_ID=${guildId}`;
 	fs.writeFileSync(path.join(projectPath, ".env"), envContent);
 	console.log("Environment variables saved to .env file.");
+};
+
+const editPackageJson = async () => {
+	// create npm run dev script
+	const packageJsonPath = path.join(projectPath, "package.json");
+	const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+	packageJson.scripts = {
+		dev: "nodemon index.js",
+		deploy: "node deploy-commands.js",
+	};
+	JSON.stringify(packageJson, null, 2);
+	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+	console.log("Created start and deploy scripts.");
 };
 
 main();
