@@ -5,13 +5,53 @@ const fs = require("fs");
 const path = require("path");
 const fse = require("fs-extra");
 
+const features = [
+	{
+		title: "Commands",
+		value: "commands",
+		dependencies: ["events"],
+		npmDependencies: [],
+		additionalPrompts: [],
+	},
+	{
+		title: "Events",
+		value: "events",
+		dependencies: [],
+		npmDependencies: [],
+		additionalPrompts: [],
+	},
+	{
+		title: "MongoDB",
+		value: "mongoDB",
+		dependencies: [],
+		npmDependencies: ["mongodb"],
+		additionalPrompts: [
+			{
+				type: "text",
+				name: "MONGO_URI",
+				message: "Enter your MongoDB connection string:",
+				validate: (value) => (value ? true : "MongoDB URI is required"),
+			},
+		],
+	},
+	{
+		title: "JSON Database",
+		value: "jsonDB",
+		dependencies: [],
+		npmDependencies: [],
+		additionalPrompts: [],
+	},
+];
+
 let projectPath = process.cwd();
+let selectedFeaturesArray;
 
 const main = async () => {
 	await initDirectory();
 	await promptFeatures();
 	await promptConfig();
 	await editPackageJson();
+	await installDependencies();
 
 	console.log(
 		"Project setup complete! You can now start your bot by running 'npm run dev'."
@@ -35,12 +75,9 @@ const initDirectory = async () => {
 	}
 
 	console.log(`Creating project in ${projectPath}`);
-	console.log("Installing dependencies...");
 
 	await execa("npm init -y");
-	await execa("npm install discord.js dotenv");
 
-	console.log("Dependencies installed successfully.");
 	console.log("Copying base files...");
 
 	const baseFiles = ["index.js", ".gitignore", "deploy-commands.js"];
@@ -54,13 +91,6 @@ const initDirectory = async () => {
 };
 
 const promptFeatures = async () => {
-	const features = [
-		{ title: "Commands", value: "commands", dependencies: ["events"] },
-		{ title: "Events", value: "events", dependencies: [] },
-		{ title: "MongoDB", value: "mongoDB", dependencies: [] },
-		{ title: "JSON Database", value: "jsonDB", dependencies: [] },
-	];
-
 	const { selectedFeatures } = await prompts({
 		type: "multiselect",
 		name: "selectedFeatures",
@@ -81,7 +111,7 @@ const promptFeatures = async () => {
 		}
 	}
 
-	const selectedFeaturesArray = Array.from(selectedFeaturesSet);
+	selectedFeaturesArray = Array.from(selectedFeaturesSet);
 
 	if (!fs.existsSync(path.join(projectPath, "managers"))) {
 		fs.mkdirSync(path.join(projectPath, "managers"), { recursive: true });
@@ -100,7 +130,7 @@ const promptFeatures = async () => {
 		}
 	}
 
-	// Creates a djss.config.js file in the root directory of the project
+	// Creates a djst.config.js file in the root directory of the project
 	const configContent = `module.exports = {\n\tuseEvents: ${selectedFeaturesSet.has(
 		"events"
 	)},\n\tuseCommands: ${selectedFeaturesSet.has(
@@ -108,7 +138,7 @@ const promptFeatures = async () => {
 	)},\n\tuseMongoDB: ${selectedFeaturesSet.has(
 		"mongoDB"
 	)},\n\tuseJSONDB: ${selectedFeaturesSet.has("jsonDB")},\n};`;
-	fs.writeFileSync(path.join(projectPath, "djss.config.js"), configContent);
+	fs.writeFileSync(path.join(projectPath, "djst.config.js"), configContent);
 
 	console.log("Project setup complete.");
 };
@@ -135,7 +165,18 @@ const promptConfig = async () => {
 		validate: (value) => (value ? true : "Guild ID is required"),
 	});
 
-	const envContent = `TOKEN=${token}\nCLIENT_ID=${clientId}\nGUILD_ID=${guildId}`;
+	let envContent = `TOKEN=${token}\nCLIENT_ID=${clientId}\nGUILD_ID=${guildId}`;
+
+	for (const feature of selectedFeaturesArray) {
+		for (const additionalPrompt of features.find((f) => f.value === feature)
+			.additionalPrompts) {
+			const response = await prompts(additionalPrompt);
+			envContent += `\n${additionalPrompt.name}=${
+				response[additionalPrompt.name]
+			}`;
+		}
+	}
+
 	fs.writeFileSync(path.join(projectPath, ".env"), envContent);
 	console.log("Environment variables saved to .env file.");
 };
@@ -151,6 +192,24 @@ const editPackageJson = async () => {
 	JSON.stringify(packageJson, null, 2);
 	fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 	console.log("Created start and deploy scripts.");
+};
+
+const installDependencies = async () => {
+	const { execa } = await import("execa"); // Use dynamic import for execa
+
+	let dependencies = "discord.js dotenv ";
+
+	for (const feature of selectedFeaturesArray) {
+		dependencies +=
+			features[
+				features.findIndex((f) => f.value === feature)
+			].npmDependencies.join(" ");
+	}
+
+	console.log("Installing dependencies...");
+	await execa("npm install " + dependencies);
+	await execa("npm install nodemon --save-dev");
+	console.log("Dependencies installed.");
 };
 
 main();

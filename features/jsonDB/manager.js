@@ -33,5 +33,5 @@ class JsonDatabase {
 }
 
 module.exports = (client) => {
-	client.db = new JsonDatabase();
+	client.json = new JsonDatabase();
 };

@@ -4,7 +4,7 @@ const {
 	useCommands,
 	useMongoDB,
 	useJSONDB,
-} = require("./djss.config.js");
+} = require("./djst.config.js");
 
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const token = process.env.TOKEN;

@@ -1,9 +1,9 @@
 const { MongoClient } = require("mongodb");
-const { MongoDB_URI } = process.env;
+const { MONGO_URI } = process.env;
 
 module.exports = (client) => {
 	// mongodb
-	const mongoClient = new MongoClient(MongoDB_URI, {
+	const mongoClient = new MongoClient(MONGO_URI, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	});
