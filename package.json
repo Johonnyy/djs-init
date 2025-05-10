@@ -1,37 +1,37 @@
 {
-  "name": "djs-init",
-  "version": "1.0.1",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon index.js",
-    "deploy": "node deploy-commands.js"
-  },
-  "keywords": [
-    "discord.js",
-    "discord",
-    "bot",
-    "template"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Johonnyy/djs-init.git"
-  },
-  "author": "johonny",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^14.19.3",
-    "dotenv": "^16.5.0",
-    "execa": "^9.5.2",
-    "fs-extra": "^11.3.0",
-    "prompts": "^2.4.2"
-  },
-  "description": "A simple CLI tool to create a discord.js bot.",
-  "bin": {
-    "djss": "index.js"
-  },
-  "devDependencies": {},
-  "bugs": {
-    "url": "https://github.com/Johonnyy/djs-init/issues"
-  },
-  "homepage": "https://github.com/Johonnyy/djs-init#readme"
+	"name": "djs-init",
+	"version": "1.0.4",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon index.js",
+		"deploy": "node deploy-commands.js"
+	},
+	"keywords": [
+		"discord.js",
+		"discord",
+		"bot",
+		"template"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Johonnyy/djs-init.git"
+	},
+	"author": "johonny",
+	"license": "ISC",
+	"dependencies": {
+		"discord.js": "^14.19.3",
+		"dotenv": "^16.5.0",
+		"execa": "^9.5.2",
+		"fs-extra": "^11.3.0",
+		"prompts": "^2.4.2"
+	},
+	"description": "A simple CLI tool to create a discord.js bot.",
+	"bin": {
+		"djss": "index.js"
+	},
+	"devDependencies": {},
+	"bugs": {
+		"url": "https://github.com/Johonnyy/djs-init/issues"
+	},
+	"homepage": "https://github.com/Johonnyy/djs-init#readme"
 }
