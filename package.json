@@ -1,6 +1,6 @@
 {
 	"name": "djs-init",
-	"version": "1.0.4",
+	"version": "1.1.1",
 	"main": "index.js",
 	"scripts": {
 		"dev": "nodemon index.js",

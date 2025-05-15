@@ -14,7 +14,7 @@ export default (client: ExpandedClient) => {
 		const commandsPath = path.join(foldersPath, folder);
 		const commandFiles = fs
 			.readdirSync(commandsPath)
-			.filter((file: string) => file.endsWith(".ts"));
+			.filter((file: string) => file.endsWith(".ts") || file.endsWith(".js"));
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
 			const command = require(filePath);

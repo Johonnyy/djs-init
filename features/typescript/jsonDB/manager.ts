@@ -6,12 +6,18 @@ interface JsonData {
 	[key: string]: any;
 }
 
-class JsonDatabase {
+export interface JSONDatabase {
+	get<T>(key: string): T | undefined;
+	set<T>(key: string, value: T): void;
+	delete(key: string): void;
+}
+
+class JsonDatabase implements JSONDatabase {
 	private filePath: string;
 	private data: JsonData;
 
 	constructor(fileName: string = "database.json") {
-		this.filePath = path.join(__dirname, "..", fileName);
+		this.filePath = path.join(process.cwd(), fileName);
 
 		if (!fs.existsSync(this.filePath)) {
 			fs.writeFileSync(this.filePath, JSON.stringify({}));
@@ -24,17 +30,46 @@ class JsonDatabase {
 		fs.writeFileSync(this.filePath, JSON.stringify(this.data, null, 2));
 	}
 
+	private resolvePath(obj: any, path: string): [any, string] | undefined {
+		const keys = path.split(".");
+		const lastKey = keys.pop();
+		if (!lastKey) return undefined;
+
+		let current = obj;
+		for (const key of keys) {
+			if (!(key in current)) current[key] = {};
+			current = current[key];
+		}
+		return [current, lastKey];
+	}
+
 	public get<T>(key: string): T | undefined {
-		return this.data[key] as T;
+		const keys = key.split(".");
+		let current: any = this.data;
+
+		for (const k of keys) {
+			if (!(k in current)) return undefined;
+			current = current[k];
+		}
+
+		return current as T;
 	}
 
 	public set<T>(key: string, value: T): void {
-		this.data[key] = value;
+		const resolved = this.resolvePath(this.data, key);
+		if (!resolved) return;
+
+		const [parent, lastKey] = resolved;
+		parent[lastKey] = value;
 		this.save();
 	}
 
 	public delete(key: string): void {
-		delete this.data[key];
+		const resolved = this.resolvePath(this.data, key);
+		if (!resolved) return;
+
+		const [parent, lastKey] = resolved;
+		delete parent[lastKey];
 		this.save();
 	}
 }

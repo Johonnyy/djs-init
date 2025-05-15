@@ -2,7 +2,7 @@ import { Events, MessageFlags, Collection, Interaction } from "discord.js";
 import { ExpandedClient, ExpandedInteraction } from "../types";
 
 export const name = Events.InteractionCreate;
-export const once = true;
+export const once = false;
 export const execute = async (interaction: ExpandedInteraction) => {
 	if (!interaction.isChatInputCommand()) return;
 
